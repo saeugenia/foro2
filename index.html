@@ -42,7 +42,6 @@
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
         
         .glass-header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid #e2e8f0; }
         .text-brand { background: linear-gradient(90deg, #c9a227 0%, #b91c1c 50%, #101935 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -52,17 +51,17 @@
         .filter-chip { transition: all 0.2s; white-space: nowrap; }
         .filter-chip.active { background-color: #101935; color: white; border-color: #101935; }
 
-        /* Calendario UX Transparencia */
+        /* Calendario UX (Transparencia perfecta) */
         .calendar-day { transition: all 0.2s ease; cursor: pointer; border-radius: 8px; }
         .calendar-day:hover { background-color: #e2e8f0; }
         .calendar-day.selected { background-color: #101935; color: white !important; font-weight: bold; transform: scale(1.05); box-shadow: 0 4px 10px rgba(16,25,53,0.2); }
         .calendar-day.selected span { color: #ffffff !important; }
+        /* Fondo semi-transparente para leer el número del día actual */
         .calendar-day.today { border: 2px solid #c9a227; background-color: rgba(201, 162, 39, 0.2) !important; color: #101935 !important; font-weight: bold; }
 
         .skeleton { background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 6px; }
         @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
         
-        /* Animaciones para transiciones de vistas */
         .fade-in { animation: fadeIn 0.5s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -73,7 +72,7 @@
         <i class="fa-solid fa-cloud-bolt"></i> Trabajando sin conexión.
     </div>
 
-    <div id="landing-view" class="flex-1 flex items-center justify-center relative overflow-hidden px-4 py-12 z-10">
+    <div id="landing-view" class="flex-1 flex items-center justify-center relative overflow-hidden px-4 py-12 z-10 fade-in">
         <div class="absolute top-0 left-0 w-full h-2 bg-instBlue flex"><div class="w-1/3 h-full bg-instGold"></div><div class="w-16 h-full bg-instRed"></div></div>
         <div class="absolute -top-40 -right-40 w-96 h-96 bg-instGold rounded-full mix-blend-multiply filter blur-[80px] opacity-20 animate-pulse"></div>
         <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-instBlue rounded-full mix-blend-multiply filter blur-[80px] opacity-10"></div>
@@ -107,7 +106,8 @@
         <header class="glass-header sticky top-0 z-40 shadow-sm">
             <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
                 <div class="flex items-center gap-3">
-                    <img src="logo2.jpg" alt="Logo" class="w-10 h-10 object-contain rounded-lg shadow-sm border border-border bg-white p-0.5">
+                    <img src="logo2.jpg" alt="Logo" class="w-10 h-10 object-contain rounded-lg shadow-sm border border-border bg-white p-0.5" onerror="this.style.display='none'; document.getElementById('school-icon-app').style.display='block';">
+                    <div id="school-icon-app" class="hidden text-instBlue text-2xl"><i class="fa-solid fa-building-columns"></i></div>
                     <div>
                         <h1 class="font-extrabold text-xl leading-none text-brand">Conecta Edu</h1>
                         <span class="text-[9px] text-textSoft font-bold tracking-widest uppercase">Escuela Santa Eugenia</span>
@@ -115,11 +115,13 @@
                 </div>
                 
                 <div class="flex items-center gap-4">
-                    <div class="hidden sm:block text-right">
-                        <p id="header-user-name" class="text-sm font-bold text-textMain leading-tight"></p>
-                        <p id="header-user-role" class="text-[10px] text-instBlue font-bold uppercase tracking-wider"></p>
+                    <div id="header-user-info" class="hidden items-center gap-3">
+                        <div class="hidden sm:block text-right">
+                            <p id="header-user-name" class="text-sm font-bold text-textMain leading-tight"></p>
+                            <p id="header-user-role" class="text-[10px] text-instBlue font-bold uppercase tracking-wider"></p>
+                        </div>
+                        <img id="header-avatar" src="" class="w-10 h-10 rounded-full border-2 border-surfaceAlt shadow-sm">
                     </div>
-                    <img id="header-avatar" src="" class="w-10 h-10 rounded-full border-2 border-surfaceAlt shadow-sm">
                     <button id="btn-logout" class="text-textSoft hover:text-instRed transition-colors p-2 bg-white rounded-lg border border-border shadow-sm hover:bg-red-50"><i class="fa-solid fa-right-from-bracket"></i></button>
                 </div>
             </div>
@@ -142,14 +144,14 @@
             
             <div id="view-feed" class="md:col-span-8 space-y-6">
                 
-                <div id="quick-post-trigger" class="bg-white rounded-xl shadow-sm border border-border p-4 flex items-center gap-3 cursor-pointer hover:bg-slate-50 transition-colors" onclick="window.openPostModal()">
+                <div id="quick-post-trigger" class="hidden bg-white rounded-xl shadow-sm border border-border p-4 flex items-center gap-3 cursor-pointer hover:bg-slate-50 transition-colors" onclick="window.openPostModal()">
                     <div class="w-10 h-10 rounded-full bg-surfaceAlt border border-border flex items-center justify-center text-instBlue shrink-0 shadow-sm"><i class="fa-solid fa-pen"></i></div>
                     <div class="bg-surfaceAlt border border-border rounded-lg py-2.5 px-4 text-textSoft text-sm flex-1 font-medium shadow-inner">Redactar nuevo comunicado oficial...</div>
                     <div class="text-textSoft hover:text-instBlue px-2"><i class="fa-solid fa-paperclip text-lg"></i></div>
                 </div>
 
                 <div class="flex flex-col gap-3">
-                    <div class="flex items-center gap-2 overflow-x-auto pb-2 pt-1 w-full no-scrollbar" id="filters-container">
+                    <div class="flex items-center gap-2 overflow-x-auto pb-2 pt-1 w-full" id="filters-container">
                         <input type="hidden" id="filter-course" value="todos">
                         <button class="filter-chip active px-4 py-1.5 rounded-full border border-border bg-instBlue text-white text-xs font-semibold shrink-0" data-filter="course" data-val="todos">Todos</button>
                         <button class="filter-chip px-4 py-1.5 rounded-full border border-border bg-white text-textSoft text-xs font-semibold shrink-0" data-filter="course" data-val="General / Toda la Institución">General</button>
@@ -227,7 +229,7 @@
                     </div>
                 </div>
 
-                <div class="hidden md:block bg-instBlue rounded-xl p-6 shadow-float text-white relative overflow-hidden">
+                <div class="hidden md:block bg-instBlue rounded-xl p-6 shadow-float text-white relative overflow-hidden" data-aos="fade-left">
                     <div class="absolute -right-4 -bottom-4 text-white/10 text-7xl"><i class="fa-solid fa-shield-halved"></i></div>
                     <h3 class="font-bold text-sm mb-2 relative z-10 flex items-center gap-2"><i class="fa-solid fa-scale-balanced text-instGold"></i> Normativa Institucional</h3>
                     <p class="text-[11px] text-white/80 leading-relaxed relative z-10 mb-4 font-medium">Plataforma moderada. Todo uso debe enmarcarse en el respeto y la colaboración académica.</p>
@@ -280,6 +282,20 @@
         </article>
     </template>
 
+    <template id="tpl-event">
+        <div class="bg-surfaceAlt border border-gold-soft p-3 rounded-lg relative group transition-all text-left mb-2 shadow-sm">
+            <div class="flex justify-between items-start mb-1">
+                <h6 class="ev-title text-xs font-bold text-instBlue flex-1 leading-tight pr-2"></h6>
+                <div class="flex items-center gap-1 shrink-0">
+                    <span class="ev-time text-[9px] font-bold bg-surface px-1.5 py-0.5 rounded border border-border text-textSoft flex items-center"><i class="fa-regular fa-clock mr-1"></i></span>
+                    <button class="ev-delete hidden text-textSoft hover:text-instRed transition-colors p-0.5"><i class="fa-solid fa-trash-can text-[10px]"></i></button>
+                </div>
+            </div>
+            <div class="ev-badges flex flex-wrap gap-1 mb-1.5 hidden"></div>
+            <p class="ev-desc text-[10px] text-textSoft leading-snug hidden"></p>
+        </div>
+    </template>
+
     <div id="modal-container" class="fixed inset-0 bg-[#101935]/80 backdrop-blur-sm hidden z-50 flex items-center justify-center transition-opacity opacity-0 px-4" onclick="closeAllModals(event)">
         
         <div id="modal-create-post" class="modal-content w-full max-w-lg bg-white rounded-2xl p-6 shadow-2xl relative transition-transform transform scale-95 opacity-0" onclick="event.stopPropagation()">
@@ -291,7 +307,7 @@
                 <input type="text" id="m-post-title" placeholder="Asunto del comunicado" class="w-full p-3 border border-border rounded-lg bg-surfaceAlt text-sm font-bold" required>
                 <div class="grid grid-cols-2 gap-3">
                     <select id="m-post-course" class="w-full p-3 border border-border rounded-lg bg-surfaceAlt text-xs font-bold cursor-pointer" required>
-                        <option value="General / Toda la Institución">Toda la Escuela</option>
+                        <option value="General / Toda la Institución">General / Todos los Cursos</option>
                         <option value="Prekínder">Prekínder</option>
                         <option value="Kínder">Kínder</option>
                         <option value="1° Básico">1° Básico</option>
@@ -337,10 +353,10 @@
         </div>
 
         <div id="modal-event" class="modal-content w-full max-w-sm bg-white rounded-2xl p-6 shadow-2xl relative hidden transition-transform transform scale-95 opacity-0" onclick="event.stopPropagation()">
-            <h2 class="text-lg font-bold text-instBlue mb-4 border-b border-border pb-3 flex items-center gap-2"><i class="fa-solid fa-calendar-plus text-instGold"></i> Agendar Actividad</h2>
+            <h2 class="text-lg font-bold text-instBlue mb-4 border-b border-border pb-3 flex items-center gap-2"><i class="fa-solid fa-calendar-plus text-instGold"></i> Agendar</h2>
             <form id="event-form" class="space-y-3">
                 <input type="hidden" id="event-date-val">
-                <input type="text" id="event-title" placeholder="Título corto (Ej: Prueba / Reunión)" class="w-full p-3 border border-border rounded-lg bg-surfaceAlt text-sm font-bold" required>
+                <input type="text" id="event-title" placeholder="Título (Ej: Prueba / Reunión)" class="w-full p-3 border border-border rounded-lg bg-surfaceAlt text-sm font-bold" required>
                 <div class="grid grid-cols-2 gap-2">
                     <select id="event-type" class="w-full p-3 border border-border rounded-lg bg-surfaceAlt text-xs font-bold outline-none cursor-pointer">
                         <option value="evento">Evento General</option>
@@ -362,6 +378,11 @@
                         <option value="Ciencias">Ciencias</option>
                         <option value="Historia">Historia</option>
                         <option value="Inglés">Inglés</option>
+                        <option value="Edu. Física">Edu. Física</option>
+                        <option value="Artes">Artes</option>
+                        <option value="Música">Música</option>
+                        <option value="Tecnología">Tecnología</option>
+                        <option value="Religión">Religión</option>
                     </select>
                 </div>
 
@@ -372,7 +393,7 @@
             </form>
         </div>
 
-        <div id="modal-rules" class="modal-content w-full max-w-sm bg-white rounded-2xl p-6 shadow-2xl relative hidden transition-transform transform scale-95 opacity-0" onclick="event.stopPropagation()">
+        <div id="modal-rules" class="modal-content w-full max-w-md bg-white rounded-2xl p-6 shadow-2xl relative hidden transition-transform transform scale-95 opacity-0" onclick="event.stopPropagation()">
             <div class="text-center mb-5">
                 <div class="w-14 h-14 bg-surfaceAlt text-instBlue border border-border rounded-full flex items-center justify-center mx-auto mb-3 text-2xl"><i class="fa-solid fa-scale-balanced text-instGold"></i></div>
                 <h2 class="text-lg font-bold text-textMain">Normas de Convivencia</h2>
@@ -399,7 +420,12 @@
                 </select>
                 <div id="extra-fields" class="hidden space-y-3">
                     <input type="text" id="user-name" placeholder="Su Nombre y Apellido" class="w-full p-3 border border-border rounded-lg bg-surfaceAlt font-bold" required>
-                    <input type="text" id="user-course" placeholder="Curso (Ej: 1° Básico)" class="w-full p-3 border border-border rounded-lg bg-surfaceAlt font-bold" required>
+                    <select id="user-course" class="w-full p-3 border border-border rounded-lg bg-surfaceAlt font-bold" required>
+                        <option value="">Seleccione su curso...</option>
+                        <option value="Prekínder">Prekínder</option><option value="Kínder">Kínder</option>
+                        <option value="1° Básico">1° Básico</option><option value="2° Básico">2° Básico</option><option value="3° Básico">3° Básico</option><option value="4° Básico">4° Básico</option><option value="5° Básico">5° Básico</option><option value="6° Básico">6° Básico</option><option value="7° Básico">7° Básico</option><option value="8° Básico">8° Básico</option>
+                        <option value="1° Medio">1° Medio</option><option value="2° Medio">2° Medio</option><option value="3° Medio">3° Medio</option><option value="4° Medio">4° Medio</option>
+                    </select>
                 </div>
                 <button type="submit" id="btn-submit-onboarding" class="w-full bg-instBlue text-white font-bold py-3 rounded-lg mt-2 hidden shadow-sm hover:bg-[#1a274d]">Guardar e Ingresar</button>
             </form>
@@ -416,14 +442,12 @@
         const app = initializeApp(firebaseConfig); const db = getFirestore(app); const auth = getAuth(app); const storage = getStorage(app); const provider = new GoogleAuthProvider();
         
         const STATE = { currentUser: null, userData: null, posts: [], events: [] };
-        
         AOS.init({ once: true, duration: 600 });
         
         window.showSuccess = (msg) => Toastify({text: `<i class="fa-solid fa-check-circle"></i> ${msg}`, escapeMarkup: false, style: {background: '#0f766e', borderRadius: '8px', fontWeight: 'bold', fontSize: '13px'}, duration: 3000}).showToast();
         window.showError = (msg) => Toastify({text: `<i class="fa-solid fa-triangle-exclamation"></i> ${msg}`, escapeMarkup: false, style: {background: '#b91c1c', borderRadius: '8px', fontWeight: 'bold', fontSize: '13px'}, duration: 3000}).showToast();
 
         const sanitize = str => { const div = document.createElement('div'); div.textContent = str || ''; return div.innerHTML; };
-
         const timeAgo = (iso) => {
             const date = new Date(iso), sec = Math.floor((new Date() - date) / 1000);
             if(sec < 60) return 'Ahora'; if(sec < 3600) return `Hace ${Math.floor(sec/60)} m`; if(sec < 86400) return `Hace ${Math.floor(sec/3600)} h`;
@@ -455,11 +479,8 @@
         window.openRulesModal = () => openModal('modal-rules');
 
         setPersistence(auth, browserSessionPersistence);
-        
-        // Logins
         const doLogin = async () => { try { await signInWithPopup(auth, provider); } catch(e){ showError("Error al autenticar"); } };
         document.getElementById('btn-login-landing').onclick = doLogin;
-        document.getElementById('btn-login').onclick = doLogin;
         document.getElementById('btn-logout').onclick = () => signOut(auth);
 
         onAuthStateChanged(auth, async (user) => {
@@ -493,29 +514,20 @@
 
         const updateUI = () => {
             const isLog = !!STATE.userData; const isFunc = STATE.userData?.rol === 'Funcionario';
-            
-            // Hard Gate: Landing vs App
             if(isLog) {
                 document.getElementById('landing-view').classList.add('hidden');
-                document.getElementById('app-view').classList.remove('hidden');
-                document.getElementById('app-view').classList.add('flex', 'fade-in');
-                
+                document.getElementById('app-view').classList.remove('hidden'); document.getElementById('app-view').classList.add('flex', 'fade-in');
                 const ava = STATE.currentUser.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(STATE.userData.nombre)}&background=101935&color=fff`;
                 document.getElementById('header-avatar').src = ava;
                 document.getElementById('header-user-name').innerText = STATE.userData.nombre.split(' ')[0];
                 document.getElementById('header-user-role').innerText = STATE.userData.rol;
-                document.getElementById('header-user-info').classList.remove('hidden');
-                document.getElementById('header-user-info').classList.add('flex');
-                document.getElementById('btn-login').classList.add('hidden');
-                document.getElementById('btn-logout').classList.remove('hidden');
-                
+                document.getElementById('header-user-info').classList.remove('hidden'); document.getElementById('header-user-info').classList.add('flex');
+                document.getElementById('quick-post-trigger').classList.toggle('hidden', !isFunc);
                 document.getElementById('btn-add-event').classList.toggle('hidden', !isFunc);
                 renderPosts();
             } else {
-                document.getElementById('landing-view').classList.remove('hidden');
-                document.getElementById('landing-view').classList.add('fade-in');
-                document.getElementById('app-view').classList.add('hidden');
-                document.getElementById('app-view').classList.remove('flex');
+                document.getElementById('landing-view').classList.remove('hidden'); document.getElementById('landing-view').classList.add('fade-in');
+                document.getElementById('app-view').classList.add('hidden'); document.getElementById('app-view').classList.remove('flex');
             }
         };
 
