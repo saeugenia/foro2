@@ -356,7 +356,7 @@
             <h2 class="text-lg font-bold text-instBlue mb-4 border-b border-border pb-3 flex items-center gap-2"><i class="fa-solid fa-calendar-plus text-instGold"></i> Agendar</h2>
             <form id="event-form" class="space-y-3">
                 <input type="hidden" id="event-date-val">
-                <input type="text" id="event-title" placeholder="Título (Ej: Prueba / Reunión)" class="w-full p-3 border border-border rounded-lg bg-surfaceAlt text-sm font-bold" required>
+                <input type="text" id="event-title" placeholder="Título corto (Ej: Prueba / Reunión)" class="w-full p-3 border border-border rounded-lg bg-surfaceAlt text-sm font-bold" required>
                 <div class="grid grid-cols-2 gap-2">
                     <select id="event-type" class="w-full p-3 border border-border rounded-lg bg-surfaceAlt text-xs font-bold outline-none cursor-pointer">
                         <option value="evento">Evento General</option>
@@ -442,6 +442,7 @@
         const app = initializeApp(firebaseConfig); const db = getFirestore(app); const auth = getAuth(app); const storage = getStorage(app); const provider = new GoogleAuthProvider();
         
         const STATE = { currentUser: null, userData: null, posts: [], events: [] };
+        
         AOS.init({ once: true, duration: 600 });
         
         window.showSuccess = (msg) => Toastify({text: `<i class="fa-solid fa-check-circle"></i> ${msg}`, escapeMarkup: false, style: {background: '#0f766e', borderRadius: '8px', fontWeight: 'bold', fontSize: '13px'}, duration: 3000}).showToast();
@@ -514,20 +515,28 @@
 
         const updateUI = () => {
             const isLog = !!STATE.userData; const isFunc = STATE.userData?.rol === 'Funcionario';
+            
             if(isLog) {
                 document.getElementById('landing-view').classList.add('hidden');
-                document.getElementById('app-view').classList.remove('hidden'); document.getElementById('app-view').classList.add('flex', 'fade-in');
+                document.getElementById('app-view').classList.remove('hidden');
+                document.getElementById('app-view').classList.add('flex', 'fade-in');
+                
                 const ava = STATE.currentUser.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(STATE.userData.nombre)}&background=101935&color=fff`;
                 document.getElementById('header-avatar').src = ava;
                 document.getElementById('header-user-name').innerText = STATE.userData.nombre.split(' ')[0];
                 document.getElementById('header-user-role').innerText = STATE.userData.rol;
-                document.getElementById('header-user-info').classList.remove('hidden'); document.getElementById('header-user-info').classList.add('flex');
-                document.getElementById('quick-post-trigger').classList.toggle('hidden', !isFunc);
+                document.getElementById('header-user-info').classList.remove('hidden');
+                document.getElementById('header-user-info').classList.add('flex');
+                
+                document.getElementById('quick-post-trigger').classList.remove('hidden');
                 document.getElementById('btn-add-event').classList.toggle('hidden', !isFunc);
                 renderPosts();
             } else {
-                document.getElementById('landing-view').classList.remove('hidden'); document.getElementById('landing-view').classList.add('fade-in');
-                document.getElementById('app-view').classList.add('hidden'); document.getElementById('app-view').classList.remove('flex');
+                document.getElementById('landing-view').classList.remove('hidden');
+                document.getElementById('landing-view').classList.add('fade-in');
+                document.getElementById('app-view').classList.add('hidden');
+                document.getElementById('app-view').classList.remove('flex');
+                document.getElementById('quick-post-trigger').classList.add('hidden');
             }
         };
 
@@ -596,7 +605,9 @@
                     p.replies.forEach(rp => { rl.innerHTML += `<div class="bg-surfaceAlt p-3 rounded-xl border border-border"><div class="flex items-center mb-1.5"><strong class="text-xs text-textMain">${sanitize(rp.authorName)}</strong>${rp.role==='Funcionario'?'<span class="text-[8px] bg-instBlue text-white px-1.5 py-0.5 rounded ml-2 font-bold"><i class="fa-solid fa-shield-check text-instGold"></i> Oficial</span>':''}<span class="text-[10px] text-textSoft font-medium ml-auto">${timeAgo(rp.date)}</span></div><p class="text-[13px] text-textMain font-medium">${sanitize(rp.text)}</p></div>`; });
                 }
                 
-                if(STATE.currentUser && (p.authorId===STATE.currentUser.uid || isOfi)) { const a = n.querySelector('.post-actions'); a.classList.remove('hidden'); a.querySelector('.btn-delete').onclick = async () => { const res = await Swal.fire({title:'¿Retirar Comunicado?', icon:'warning', showCancelButton:true, confirmButtonColor: '#b91c1c'}); if(res.isConfirmed) { await deleteDoc(doc(db,"posts",p.id)); showSuccess('Retirado'); } }; }
+                const isCurrentFunc = STATE.userData?.rol === 'Funcionario';
+                if(isCurrentFunc) { const a = n.querySelector('.post-actions'); a.classList.remove('hidden'); a.querySelector('.btn-delete').onclick = async () => { const res = await Swal.fire({title:'¿Retirar Comunicado?', icon:'warning', showCancelButton:true, confirmButtonColor: '#b91c1c'}); if(res.isConfirmed) { await deleteDoc(doc(db,"posts",p.id)); showSuccess('Retirado'); } }; }
+                
                 const frm = n.querySelector('.post-reply-form'); frm.onsubmit = async e => { e.preventDefault(); const i=frm.querySelector('input'); const btn=frm.querySelector('button'); btn.disabled=true; await updateDoc(doc(db,"posts",p.id), {replies:arrayUnion({id:Date.now().toString(), authorName:STATE.userData.nombre, role:STATE.userData.rol, text:i.value, date:new Date().toISOString()})}); i.value=''; btn.disabled=false; showSuccess('Enviado'); };
                 cont.appendChild(n);
             });
